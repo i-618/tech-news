@@ -173,13 +173,13 @@
 
     function saveToSession(data) {
       try {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       } catch (e) {}
     }
 
     function loadFromSession() {
       try {
-        const data = sessionStorage.getItem(STORAGE_KEY);
+        const data = localStorage.getItem(STORAGE_KEY);
         return data ? JSON.parse(data) : null;
       } catch (e) {
         return null;
@@ -382,6 +382,11 @@
     });
 
     loadSlides();
+
+    // Register Service Worker for offline support
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
   </script>
 </body>
 </html>
