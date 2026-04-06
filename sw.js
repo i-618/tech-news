@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tech-news-v1';
+const CACHE_NAME = 'tech-news-v2';
 
 // Install: cache core assets
 self.addEventListener('install', (event) => {

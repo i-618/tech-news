@@ -157,7 +157,7 @@
         } catch (e) {}
 
         try {
-          const pngRes = await fetch(pngFile, { method: 'HEAD' });
+          const pngRes = await fetch(pngFile);
           if (pngRes.ok) {
             loaded.push({ type: 'png', src: pngFile, source: '' });
             index++;
