@@ -147,7 +147,7 @@
         const pngFile = `latest/${index}.png`;
 
         try {
-          const jsonRes = await fetch(jsonFile, { cache: 'no-store' });
+          const jsonRes = await fetch(jsonFile);
           if (jsonRes.ok) {
             const data = await jsonRes.json();
             loaded.push({ type: 'json', content: data.content, source: data.source });
@@ -157,7 +157,7 @@
         } catch (e) {}
 
         try {
-          const pngRes = await fetch(pngFile, { method: 'HEAD', cache: 'no-store' });
+          const pngRes = await fetch(pngFile, { method: 'HEAD' });
           if (pngRes.ok) {
             loaded.push({ type: 'png', src: pngFile, source: '' });
             index++;
