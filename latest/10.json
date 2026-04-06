@@ -1,0 +1,7 @@
+{
+  "content": "🚨We finally have a ‘Figma for AI agents’.\nMeet Awesome-design-md.\nIt's an amazing curated collection of UI systems extracted from 50+ top websites, formatted for coding agents.\nInstead of parsing screenshots or messy design files, just drop a DESIGN.md into your project.\nIt upgrades your AI’s UI skills instantly:\n→ Unlocks 50+ elite design systems: Cursor, Vercel, Stripe, Spotify, SpaceX, and more\n→ Structured into 9 clear sections: typography, spacing, elevation, rules\n→ Includes light/dark previews for quick visual checks\n→ Uses Google Stitch’s native plain-text format for LLMs\nBest part?\nYou don't have to guess the prompting.\nEvery file includes an Agent Guide with ready-to-use prompts.\nAGENTS.md controls the logic. DESIGN.md controls the UI 👊\n100% Free and open-source.",
+  "source": "@DataChaz from x(twitter)",
+  "imageUrl": "https://pbs.twimg.com/media/HE4_tkjbQAAAVi9.png",
+  "id": "dd9a6300-4752-46d9-ba7b-b2768c248cc7",
+  "savedAt": "2026-04-06T09:35:10.051Z"
+}

@@ -1,0 +1,7 @@
+{
+  "content": "🚨 Researchers just proved that every major AI model fails at the same thing.\nNot reasoning. Not coding. Not math.\nBuilding tools from scratch.\nTool-Genesis gave AI agents a real-world task with zero pre-written specs. No schemas. No documentation. Just: figure out what tools you need and build them.\nThe results:\n→ GPT-5.1: 37% success rate in single-pass mode\n→ Gemini-3-Flash: 10%\n→ Claude Haiku: effectively 0%\n-The models could write compliant-looking schemas. They just couldn't build tools that actually worked.\n-And the failures didn't happen at the end. They happened at the start.\nA tiny interface error in step one cascades through the entire pipeline:\nWrong parameter name. Missed constraint. Ambiguous type.\nBy the final task, that small mistake has compounded into a complete failure.\nThe paper calls this the \"utility-conversion bottleneck.\"\nHigh compliance scores. Plausible-looking schemas. Zero downstream success.\nOne thing actually fixes it: execution feedback in a loop.\nWhen models could run their own code, catch errors, and repair them:\n→ Gemini jumped from 10% to 58%\n→ Qwen3-235B went from 29% to 47%\nThe model that looks weakest in a single pass often recovers the most with a repair loop.\nThe next capability frontier isn't bigger context windows.\nIt's closed-loop tool creation from abstract requirements.",
+  "source": "@alex_prompter from x(twitter)",
+  "imageUrl": "https://pbs.twimg.com/media/HFE4wznb0AAdokV.png",
+  "id": "1ae4dcb6-8f6a-454b-8540-524acb0e419a",
+  "savedAt": "2026-04-06T09:26:37.075Z"
+}

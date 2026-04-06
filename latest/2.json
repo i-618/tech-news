@@ -1,4 +1,7 @@
 {
-  "content": "Artificial Intelligence reaches new milestone: Latest language models demonstrate human-level reasoning across mathematics, coding, and scientific analysis — marking a paradigm shift in machine cognition",
-  "source": "TechCrunch"
+  "content": "Microsoft has released the Agent Governance Toolkit, an open source runtime security system for managing and controlling AI agents.\n\nTLDR  \n- Open source toolkit for governing autonomous AI agents  \n- Addresses all OWASP Top 10 risks for agentic AI  \n- Works across popular frameworks like LangChain, AutoGen, CrewAI  \n- Introduces Agent OS as a policy engine for real time control  \n- Includes identity, trust scoring and secure agent communication  \n- Built in runtime controls like execution rings and kill switch  \n- Adds SRE practices like circuit breakers and error budgets  \n- Supports compliance with EU AI Act, HIPAA and SOC2    \n- Designed to be modular, extensible and framework agnostic",
+  "source": "@ai_for_success from x(twitter)",
+  "imageUrl": "https://pbs.twimg.com/media/HFDzlr_bYAABD-0.jpg",
+  "id": "4994f2af-4278-4dc1-82c7-e0a2556fb384",
+  "savedAt": "2026-04-06T09:28:27.868Z"
 }
