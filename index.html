@@ -145,13 +145,14 @@
     async function fetchSlides() {
       let index = 1;
       const loaded = [];
+      const cacheBuster = Date.now();
 
       while (true) {
         const jsonFile = `latest/${index}.json`;
         const pngFile = `latest/${index}.png`;
 
         try {
-          const jsonRes = await fetch(jsonFile);
+          const jsonRes = await fetch(`${jsonFile}?t=${cacheBuster}`);
           if (jsonRes.ok) {
             const data = await jsonRes.json();
             loaded.push({ type: 'json', content: data.content, source: data.source });
@@ -161,9 +162,9 @@
         } catch (e) {}
 
         try {
-          const pngRes = await fetch(pngFile);
+          const pngRes = await fetch(`${pngFile}?t=${cacheBuster}`, { cache: 'no-store' });
           if (pngRes.ok) {
-            loaded.push({ type: 'png', src: pngFile, source: '' });
+            loaded.push({ type: 'png', src: `${pngFile}?t=${cacheBuster}`, source: '' });
             index++;
             continue;
           }
