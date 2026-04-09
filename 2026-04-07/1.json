@@ -1,0 +1,7 @@
+{
+  "content": "AI agents face emerging security threats not just from their models, but from the environments they interact with in real time. The web itself can be weaponized, turning untrusted data into a critical attack surface.\n\n• Introduces a systematic framework identifying the web as a security vulnerability for autonomous AI agents.  \n• Demonstrates high success rates of hidden attacks: up to 86% in prompt injection and 80% in data exfiltration across agent architectures.  \n• Proposes a taxonomy of six \"AI Agent Traps\" targeting perception, memory, reasoning, action, multi-agent systems, and human oversight.  \n• Shows that minimal data contamination (<0.1%) can enable latent memory poisoning with over 80% success due to persistent memory mechanisms.",
+  "source": "@rohanpaul_ai from x(twitter)",
+  "imageUrl": "https://pbs.twimg.com/media/HFNxsv5boAEqOlg.jpg",
+  "id": "fc2a599c-190c-4dcc-bd11-b9f05f1b97e6",
+  "savedAt": "2026-04-07T04:47:28.574Z"
+}

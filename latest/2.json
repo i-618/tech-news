@@ -1,0 +1,6 @@
+{
+  "content": "Using LLMs to build personal knowledge bases is a powerful approach for organizing and exploring research topics. The system centers on automated ingestion, indexing, and synthesis of diverse sources into a structured wiki. This wiki, stored as markdown files with images, is continuously maintained and queried by the LLM agent.\n\n• Source materials like articles, papers, and images are stored in a raw directory and compiled by an LLM into a structured, linked markdown wiki with summaries and backlinks.  \n• Obsidian serves as the visual interface to navigate raw data, wiki pages, and visual outputs, while the LLM handles nearly all content creation and updates.  \n• Once sufficiently developed, the wiki enables complex Q&A, where the LLM researches and synthesizes answers, often generating new markdown, slides, or visualizations.  \n• Additional tools like search interfaces and LLM-run health checks improve data quality, suggest new connections, and support ongoing knowledge base refinement.",
+  "source": "@karpathy from x(twitter)",
+  "id": "b7ddf79f-c392-4d0e-9434-9ebbcfb1bd81",
+  "savedAt": "2026-04-09T15:59:13.769Z"
+}

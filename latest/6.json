@@ -1,0 +1,7 @@
+{
+  "content": "Turn any git repository into a portable AI agent with GitAgent.  \nIt’s a framework-agnostic standard that decouples agent definitions from specific AI platforms.  \nUsing simple files in a repo, you can create, share, and manage AI agents with full version control.\n\n• Define agents by adding just two files: agent.yaml (manifest) and SOUL.md (identity)\n• Achieve portability across frameworks like OpenAI, Claude Code, CrewAI, and AutoGen via adapters\n• Leverage git workflows for versioning, forking, collaboration, and validation via CI/CD\n• Built-in compliance support for financial regulations with role-based controls and segregation of duties",
+  "source": "@Sumanth_077 from x(twitter)",
+  "imageUrl": "https://pbs.twimg.com/media/HEvquYobIAAdYKK.jpg",
+  "id": "cf59b904-4b24-400e-b798-7e65b8a2e115",
+  "savedAt": "2026-04-09T16:03:09.836Z"
+}
