@@ -8,7 +8,7 @@
     // ═══════════════════════════════════════════════════════════
     // CONFIGURATION
     // ═══════════════════════════════════════════════════════════
-    const SLIDE_DURATION = 8;        // Slide duration in seconds
+    const SLIDE_DURATION = 15;        // Slide duration in seconds
     const MARGIN = 40;               // Margin around content in pixels
     const REFRESH_INTERVAL = 10;     // Data refresh interval in seconds
     // ═══════════════════════════════════════════════════════════
@@ -141,6 +141,7 @@
     let currentIndex = 0;
     let countdown = SLIDE_DURATION;
     let intervalId = null;
+    let isPaused = false;
 
     async function fetchSlides() {
       let index = 1;
@@ -335,7 +336,7 @@
     }
 
     function updateTimer() {
-      timerDisplay.textContent = `${countdown}s`;
+      timerDisplay.textContent = isPaused ? `Paused (${countdown}s)` : `${countdown}s`;
     }
 
     function startTimer() {
@@ -344,6 +345,7 @@
       updateTimer();
       
       intervalId = setInterval(() => {
+        if (isPaused) return;
         countdown--;
         updateTimer();
         
@@ -381,8 +383,20 @@
       showSlide(currentIndex - 1);
     }
 
+    function togglePause() {
+      if (slides.length === 0) return;
+      isPaused = !isPaused;
+      updateTimer();
+    }
+
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === ' ') next();
+      const isSpace = e.code === 'Space' || e.key === ' ' || e.key === 'Spacebar';
+      if (isSpace) {
+        e.preventDefault();
+        if (!e.repeat) togglePause();
+        return;
+      }
+      if (e.key === 'ArrowRight') next();
       if (e.key === 'ArrowLeft') prev();
     });
 
