@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Content Viewer</title>
+  <title>Tech News Ticker</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA2NCA2NCc+PHJlY3Qgd2lkdGg9JzY0JyBoZWlnaHQ9JzY0JyByeD0nMTInIGZpbGw9JyMwYTBhMGEnLz48cmVjdCB4PScxMCcgeT0nMTgnIHdpZHRoPSc0NCcgaGVpZ2h0PSczNCcgcng9JzYnIGZpbGw9JyNjNjI4MjgnLz48cmVjdCB4PScxMCcgeT0nMjgnIHdpZHRoPSc0NCcgaGVpZ2h0PSc0JyBmaWxsPScjOWUxZjFmJy8+PHJlY3QgeD0nMTAnIHk9JzM4JyB3aWR0aD0nNDQnIGhlaWdodD0nNCcgZmlsbD0nIzllMWYxZicvPjxwYXRoIGQ9J000NCwxOEM0OSwxMiw1MywxMiw1Niw4JyBzdHJva2U9JyNmNWM1NDInIHN0cm9rZS13aWR0aD0nMycgZmlsbD0nbm9uZScgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJy8+PGNpcmNsZSBjeD0nNTcnIGN5PSc4JyByPSczJyBmaWxsPScjZmZlYjNiJy8+PHRleHQgeD0nMzInIHk9JzQ2JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmb250LWZhbWlseT0nQXJpYWwsc2Fucy1zZXJpZicgZm9udC1zaXplPScxNCcgZm9udC13ZWlnaHQ9JzcwMCcgZmlsbD0nI2ZmZmZmZic+VE5UPC90ZXh0Pjwvc3ZnPg==">
   <script>
     // ═══════════════════════════════════════════════════════════
     // CONFIGURATION
@@ -11,6 +12,7 @@
     const SLIDE_DURATION = 15;        // Slide duration in seconds
     const MARGIN = 40;               // Margin around content in pixels
     const REFRESH_INTERVAL = 10;     // Data refresh interval in seconds
+    const INDEX_HTML_CHECK_INTERVAL = 60; // Check index.html updates in seconds
     // ═══════════════════════════════════════════════════════════
   </script>
   <style>
@@ -142,6 +144,7 @@
     let countdown = SLIDE_DURATION;
     let intervalId = null;
     let isPaused = false;
+    let indexHtmlSignature = null;
 
     async function fetchSlides() {
       let index = 1;
@@ -197,27 +200,86 @@
       return JSON.stringify(newData) !== JSON.stringify(oldData);
     }
 
+    function preloadImage(src) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        let completed = false;
+        const timeoutId = setTimeout(() => {
+          if (completed) return;
+          completed = true;
+          reject(new Error(`Timed out loading image: ${src}`));
+        }, 8000);
+
+        image.onload = () => {
+          if (completed) return;
+          completed = true;
+          clearTimeout(timeoutId);
+          resolve();
+        };
+
+        image.onerror = () => {
+          if (completed) return;
+          completed = true;
+          clearTimeout(timeoutId);
+          reject(new Error(`Failed to load image: ${src}`));
+        };
+
+        image.src = src;
+      });
+    }
+
+    async function imagesReady(data) {
+      const imageSlides = data.filter((slide) => slide.type === 'png');
+      if (imageSlides.length === 0) return true;
+      const results = await Promise.allSettled(
+        imageSlides.map((slide) => preloadImage(slide.src))
+      );
+      return results.every((result) => result.status === 'fulfilled');
+    }
+
+    async function applySlidesIfReady(nextSlides, preserveIndex = false) {
+      if (nextSlides.length === 0 || !dataChanged(nextSlides, slides)) return false;
+
+      const usable = await imagesReady(nextSlides);
+      if (!usable) return false;
+
+      const prevIndex = currentIndex;
+      slides = nextSlides;
+      saveToSession(slides);
+      if (preserveIndex) {
+        currentIndex = Math.min(prevIndex, slides.length - 1);
+      }
+      render();
+      if (!intervalId) startTimer();
+      return true;
+    }
+
     async function loadSlides() {
       const cached = loadFromSession();
+      let cacheRendered = false;
       
       if (cached && cached.length > 0) {
-        slides = cached;
-        render();
-        startTimer();
+        const cachedUsable = await imagesReady(cached);
+        if (cachedUsable) {
+          slides = cached;
+          render();
+          startTimer();
+          cacheRendered = true;
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
       } else {
+        container.innerHTML = '<div class="loading">Loading...</div>';
+      }
+
+      if (!cacheRendered) {
         container.innerHTML = '<div class="loading">Loading...</div>';
       }
 
       const freshData = await fetchSlides();
 
-      if (freshData.length > 0) {
-        if (dataChanged(freshData, slides)) {
-          slides = freshData;
-          saveToSession(slides);
-          render();
-          if (!intervalId) startTimer();
-        }
-      } else if (slides.length === 0) {
+      const applied = await applySlidesIfReady(freshData);
+      if (!applied && slides.length === 0) {
         container.innerHTML = '<div class="error">No content found in latest/ folder</div>';
       }
     }
@@ -225,17 +287,66 @@
     async function refreshData() {
       try {
         const freshData = await fetchSlides();
-        if (freshData.length > 0 && dataChanged(freshData, slides)) {
-          const prevIndex = currentIndex;
-          slides = freshData;
-          saveToSession(slides);
-          currentIndex = Math.min(prevIndex, slides.length - 1);
-          render();
-        }
+        await applySlidesIfReady(freshData, true);
       } catch (e) {}
     }
 
     setInterval(refreshData, REFRESH_INTERVAL * 1000);
+
+    function hashText(text) {
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) {
+        hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+      }
+      return `${hash}:${text.length}`;
+    }
+
+    async function fetchIndexHtmlSignature() {
+      const url = `./index.html?t=${Date.now()}`;
+
+      try {
+        const headRes = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+        if (headRes.ok) {
+          const etag = headRes.headers.get('etag');
+          const lastModified = headRes.headers.get('last-modified');
+          if (etag || lastModified) {
+            return `h:${etag || ''}|${lastModified || ''}`;
+          }
+        }
+      } catch (e) {}
+
+      try {
+        const htmlRes = await fetch(url, { cache: 'no-store' });
+        if (!htmlRes.ok) return null;
+
+        const etag = htmlRes.headers.get('etag');
+        const lastModified = htmlRes.headers.get('last-modified');
+        if (etag || lastModified) {
+          return `g:${etag || ''}|${lastModified || ''}`;
+        }
+
+        const html = await htmlRes.text();
+        return `b:${hashText(html)}`;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function checkForIndexHtmlUpdate() {
+      const latestSignature = await fetchIndexHtmlSignature();
+      if (!latestSignature) return;
+
+      if (!indexHtmlSignature) {
+        indexHtmlSignature = latestSignature;
+        return;
+      }
+
+      if (latestSignature !== indexHtmlSignature) {
+        window.location.reload();
+      }
+    }
+
+    setInterval(checkForIndexHtmlUpdate, INDEX_HTML_CHECK_INTERVAL * 1000);
 
     function render() {
       container.innerHTML = slides.map((slide, i) => {
@@ -401,6 +512,7 @@
     });
 
     loadSlides();
+    checkForIndexHtmlUpdate();
 
     // Register Service Worker for offline support
     if ('serviceWorker' in navigator) {
