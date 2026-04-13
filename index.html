@@ -138,13 +138,165 @@
     const dotsContainer = document.getElementById('dots');
     const timerDisplay = document.getElementById('timer');
     
-    const STORAGE_KEY = 'slideshow_data';
+    const STORAGE_KEY = 'slideshow_data_v2';
+    const LEGACY_STORAGE_KEY = 'slideshow_data';
+    const IMAGE_DB_NAME = 'tech-news-images';
+    const IMAGE_STORE_NAME = 'slides';
     let slides = [];
     let currentIndex = 0;
     let countdown = SLIDE_DURATION;
     let intervalId = null;
     let isPaused = false;
     let indexHtmlSignature = null;
+    let imageDbPromise = null;
+
+    function openImageDb() {
+      if (!('indexedDB' in window)) return Promise.resolve(null);
+      if (!imageDbPromise) {
+        imageDbPromise = new Promise((resolve) => {
+          const request = indexedDB.open(IMAGE_DB_NAME, 1);
+
+          request.onupgradeneeded = () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains(IMAGE_STORE_NAME)) {
+              db.createObjectStore(IMAGE_STORE_NAME);
+            }
+          };
+
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => resolve(null);
+        });
+      }
+      return imageDbPromise;
+    }
+
+    async function withImageStore(mode, fn) {
+      const db = await openImageDb();
+      if (!db) return null;
+
+      return new Promise((resolve) => {
+        const tx = db.transaction(IMAGE_STORE_NAME, mode);
+        const store = tx.objectStore(IMAGE_STORE_NAME);
+
+        tx.oncomplete = () => resolve(result);
+        tx.onerror = () => resolve(null);
+        tx.onabort = () => resolve(null);
+
+        let result = null;
+        try {
+          const maybeRequest = fn(store);
+          if (maybeRequest && typeof maybeRequest === 'object' && 'onsuccess' in maybeRequest) {
+            maybeRequest.onsuccess = () => {
+              result = maybeRequest.result;
+            };
+            maybeRequest.onerror = () => {
+              result = null;
+            };
+          } else {
+            result = maybeRequest;
+          }
+        } catch (e) {
+          result = null;
+        }
+      });
+    }
+
+    async function storeImageBlob(key, blob) {
+      await withImageStore('readwrite', (store) => store.put(blob, key));
+    }
+
+    async function loadImageBlob(key) {
+      return withImageStore('readonly', (store) => store.get(key));
+    }
+
+    async function listStoredImageKeys() {
+      const keys = await withImageStore('readonly', (store) => {
+        if ('getAllKeys' in store) return store.getAllKeys();
+        return null;
+      });
+      return Array.isArray(keys) ? keys : [];
+    }
+
+    async function deleteStoredImage(key) {
+      await withImageStore('readwrite', (store) => store.delete(key));
+    }
+
+    async function requestPersistentStorage() {
+      if (!navigator.storage || typeof navigator.storage.persist !== 'function') return false;
+      try {
+        return navigator.storage.persist();
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function getSlideImageUrl(slide) {
+      return slide.runtimeSrc || slide.src;
+    }
+
+    function revokeSlideUrls(items) {
+      items.forEach((slide) => {
+        if (slide.type === 'png' && slide.runtimeSrc && slide.runtimeSrc.startsWith('blob:')) {
+          URL.revokeObjectURL(slide.runtimeSrc);
+        }
+      });
+    }
+
+    async function materializeSlides(data) {
+      const materialized = [];
+
+      for (const slide of data) {
+        if (slide.type !== 'png') {
+          materialized.push(slide);
+          continue;
+        }
+
+        const imageKey = slide.imageKey || (slide.src ? slide.src.split('?')[0] : '');
+        let runtimeSrc = slide.src || '';
+
+        if (imageKey) {
+          const blob = await loadImageBlob(imageKey);
+          if (blob instanceof Blob) {
+            runtimeSrc = URL.createObjectURL(blob);
+          }
+        }
+
+        materialized.push({
+          type: 'png',
+          imageKey,
+          runtimeSrc,
+          source: slide.source || ''
+        });
+      }
+
+      return materialized;
+    }
+
+    function serializeSlides(data) {
+      return data.map((slide) => {
+        if (slide.type !== 'png') return slide;
+        return {
+          type: 'png',
+          imageKey: slide.imageKey || (slide.src ? slide.src.split('?')[0] : ''),
+          source: slide.source || ''
+        };
+      });
+    }
+
+    async function pruneStoredImages(data) {
+      const activeKeys = new Set(
+        data
+          .filter((slide) => slide.type === 'png' && slide.imageKey)
+          .map((slide) => slide.imageKey)
+      );
+
+      const storedKeys = await listStoredImageKeys();
+      await Promise.all(
+        storedKeys
+          .filter((key) => !activeKeys.has(key))
+          .map((key) => deleteStoredImage(key))
+      );
+    }
 
     async function fetchSlides() {
       let index = 1;
@@ -168,28 +320,41 @@
         try {
           const pngRes = await fetch(`${pngFile}?t=${cacheBuster}`, { cache: 'no-store' });
           if (pngRes.ok) {
-            loaded.push({ type: 'png', src: `${pngFile}?t=${cacheBuster}`, source: '' });
+            const blob = await pngRes.blob();
+            await storeImageBlob(pngFile, blob);
+            loaded.push({ type: 'png', imageKey: pngFile, source: '' });
             index++;
             continue;
           }
         } catch (e) {}
 
+        const storedBlob = await loadImageBlob(pngFile);
+        if (storedBlob instanceof Blob) {
+          loaded.push({ type: 'png', imageKey: pngFile, source: '' });
+          index++;
+          continue;
+        }
+
         break;
       }
 
-      return loaded;
+      return materializeSlides(loaded);
     }
 
     function saveToSession(data) {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeSlides(data)));
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
       } catch (e) {}
     }
 
     function loadFromSession() {
       try {
         const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : null;
+        if (data) return JSON.parse(data);
+
+        const legacyData = localStorage.getItem(LEGACY_STORAGE_KEY);
+        return legacyData ? JSON.parse(legacyData) : null;
       } catch (e) {
         return null;
       }
@@ -197,7 +362,7 @@
 
     function dataChanged(newData, oldData) {
       if (!oldData || newData.length !== oldData.length) return true;
-      return JSON.stringify(newData) !== JSON.stringify(oldData);
+      return JSON.stringify(serializeSlides(newData)) !== JSON.stringify(serializeSlides(oldData));
     }
 
     function preloadImage(src) {
@@ -232,20 +397,33 @@
       const imageSlides = data.filter((slide) => slide.type === 'png');
       if (imageSlides.length === 0) return true;
       const results = await Promise.allSettled(
-        imageSlides.map((slide) => preloadImage(slide.src))
+        imageSlides.map((slide) => preloadImage(getSlideImageUrl(slide)))
       );
       return results.every((result) => result.status === 'fulfilled');
     }
 
     async function applySlidesIfReady(nextSlides, preserveIndex = false) {
-      if (nextSlides.length === 0 || !dataChanged(nextSlides, slides)) return false;
+      if (nextSlides.length === 0) {
+        revokeSlideUrls(nextSlides);
+        return false;
+      }
+
+      if (!dataChanged(nextSlides, slides)) {
+        revokeSlideUrls(nextSlides);
+        return false;
+      }
 
       const usable = await imagesReady(nextSlides);
-      if (!usable) return false;
+      if (!usable) {
+        revokeSlideUrls(nextSlides);
+        return false;
+      }
 
       const prevIndex = currentIndex;
+      revokeSlideUrls(slides);
       slides = nextSlides;
       saveToSession(slides);
+      await pruneStoredImages(slides);
       if (preserveIndex) {
         currentIndex = Math.min(prevIndex, slides.length - 1);
       }
@@ -255,7 +433,8 @@
     }
 
     async function loadSlides() {
-      const cached = loadFromSession();
+      await requestPersistentStorage();
+      const cached = await materializeSlides(loadFromSession() || []);
       let cacheRendered = false;
       
       if (cached && cached.length > 0) {
@@ -266,7 +445,9 @@
           startTimer();
           cacheRendered = true;
         } else {
+          revokeSlideUrls(cached);
           localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem(LEGACY_STORAGE_KEY);
         }
       } else {
         container.innerHTML = '<div class="loading">Loading...</div>';
@@ -361,7 +542,7 @@
         } else {
           return `
             <div class="slide ${activeClass}">
-              <div class="content"><img src="${slide.src}" alt="Slide ${i + 1}"></div>
+              <div class="content"><img src="${getSlideImageUrl(slide)}" alt="Slide ${i + 1}"></div>
               ${slide.source ? `<div class="source">${escapeHtml(slide.source)}</div>` : ''}
             </div>
           `;
