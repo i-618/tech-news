@@ -1,0 +1,6 @@
+{
+  "content": "LLMs are now being used to control robots by generating executable code from natural language.  CaP-X is a new benchmark that evaluates this capability on real robotic manipulation tasks.  Developed by researchers from top institutions, it highlights both progress and current limitations.\n\n• Models generate control code directly from language, enabling robots to perform physical tasks  \n• Top models achieve ~30% success, far below human performance of ~90%  \n• Performance improves significantly with reinforcement learning and transfers well to real robots  \n• Higher-level task definitions boost performance, suggesting future systems will combine reasoning with specialized control",
+  "source": "@lukas_m_ziegler from x(twitter)",
+  "id": "023e37ee-48cc-4734-90c8-958a00b124b1",
+  "savedAt": "2026-04-09T15:56:16.386Z"
+}
