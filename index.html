@@ -209,6 +209,22 @@
       return withImageStore('readonly', (store) => store.get(key));
     }
 
+    async function hashBlob(blob) {
+      if (!window.crypto || !window.crypto.subtle) {
+        return `${blob.size}:${blob.type || ''}`;
+      }
+
+      try {
+        const buffer = await blob.arrayBuffer();
+        const digest = await crypto.subtle.digest('SHA-256', buffer);
+        return Array.from(new Uint8Array(digest))
+          .map((byte) => byte.toString(16).padStart(2, '0'))
+          .join('');
+      } catch (e) {
+        return `${blob.size}:${blob.type || ''}`;
+      }
+    }
+
     async function listStoredImageKeys() {
       const keys = await withImageStore('readonly', (store) => {
         if ('getAllKeys' in store) return store.getAllKeys();
@@ -264,6 +280,7 @@
         materialized.push({
           type: 'png',
           imageKey,
+          imageVersion: slide.imageVersion || '',
           runtimeSrc,
           source: slide.source || ''
         });
@@ -278,6 +295,7 @@
         return {
           type: 'png',
           imageKey: slide.imageKey || (slide.src ? slide.src.split('?')[0] : ''),
+          imageVersion: slide.imageVersion || '',
           source: slide.source || ''
         };
       });
@@ -321,8 +339,9 @@
           const pngRes = await fetch(`${pngFile}?t=${cacheBuster}`, { cache: 'no-store' });
           if (pngRes.ok) {
             const blob = await pngRes.blob();
+            const imageVersion = await hashBlob(blob);
             await storeImageBlob(pngFile, blob);
-            loaded.push({ type: 'png', imageKey: pngFile, source: '' });
+            loaded.push({ type: 'png', imageKey: pngFile, imageVersion, source: '' });
             index++;
             continue;
           }
@@ -330,7 +349,8 @@
 
         const storedBlob = await loadImageBlob(pngFile);
         if (storedBlob instanceof Blob) {
-          loaded.push({ type: 'png', imageKey: pngFile, source: '' });
+          const imageVersion = await hashBlob(storedBlob);
+          loaded.push({ type: 'png', imageKey: pngFile, imageVersion, source: '' });
           index++;
           continue;
         }
