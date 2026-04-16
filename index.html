@@ -335,6 +335,7 @@
           }
         } catch (e) {}
 
+        let canUseStoredPng = false;
         try {
           const pngRes = await fetch(`${pngFile}?t=${cacheBuster}`, { cache: 'no-store' });
           if (pngRes.ok) {
@@ -345,14 +346,18 @@
             index++;
             continue;
           }
-        } catch (e) {}
+        } catch (e) {
+          canUseStoredPng = true;
+        }
 
-        const storedBlob = await loadImageBlob(pngFile);
-        if (storedBlob instanceof Blob) {
-          const imageVersion = await hashBlob(storedBlob);
-          loaded.push({ type: 'png', imageKey: pngFile, imageVersion, source: '' });
-          index++;
-          continue;
+        if (canUseStoredPng) {
+          const storedBlob = await loadImageBlob(pngFile);
+          if (storedBlob instanceof Blob) {
+            const imageVersion = await hashBlob(storedBlob);
+            loaded.push({ type: 'png', imageKey: pngFile, imageVersion, source: '' });
+            index++;
+            continue;
+          }
         }
 
         break;
