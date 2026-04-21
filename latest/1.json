@@ -1,6 +1,7 @@
 {
-  "content": "There's a growing disconnect in how people perceive AI capabilities, largely shaped by which models they've used and in what context. Many base their views on outdated or free versions like ChatGPT’s older tiers, while others using cutting-edge, paid models in technical fields see transformative progress.\n\n• Free and outdated models like basic ChatGPT or Advanced Voice Mode create misleading impressions due to glitches and limitations not present in current state-of-the-art systems.  \n• Latest agentic models such as OpenAI Codex and Claude Code show dramatic advances, especially in programming, math, and research, where results can be verified and rewarded precisely.  \n• High-end AI capabilities are \"peaky\"—concentrated in technical domains because reinforcement learning works best there and because these areas offer greater business value.  \n• This leads to two disconnected perspectives: one group underestimates AI due to limited exposure, while professionals using advanced models witness near-magical performance, fueling vastly different beliefs about AI's real potential.",
-  "source": "@karpathy from x(twitter)",
-  "id": "ded6846b-c8f9-4a45-9974-082736a0f381",
-  "savedAt": "2026-04-16T05:06:04.680Z"
+  "content": "Every AI agent relies on three essential layers to move beyond simple chatbots and become truly effective. These layers—planning, memory, and tool use—enable agents to think, remember, and act like intelligent systems.\n\n• Planning turns reactive agents into strategic thinkers by breaking tasks into steps and adapting based on feedback  \n• Memory enables personalization and consistency by storing and retrieving both short-term conversations and long-term context  \n• Tools empower agents to take real-world actions through APIs, code executors, databases, and other external systems  \n• Without all three layers, an AI agent lacks the ability to reason, recall, or execute—reducing it to just a chatbot",
+  "source": "@BharukaShraddha from x(twitter)",
+  "imageUrl": "https://pbs.twimg.com/media/HGUy87saUAAQJ8p.jpg",
+  "id": "43ebf9c0-cf5b-4770-84ad-ca2ccb0d82f8",
+  "savedAt": "2026-04-21T05:30:55.688Z"
 }

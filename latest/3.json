@@ -1,6 +1,7 @@
 {
-  "content": "The April 2026 Dwarkesh Podcast features a deep conversation with Nvidia CEO Jensen Huang, covering the company's dominance in AI, technological strategy, and global market dynamics. Huang emphasizes that Nvidia's strength lies not just in hardware but in its entire ecosystem and long-term vision for computing.\n\n• Nvidia’s competitive edge comes from its full-stack ecosystem and the difficulty of commoditizing high-performance computing.  \n• Custom chips like Google’s TPUs don’t match Nvidia’s performance-per-total cost of ownership or the widespread CUDA software advantage.  \n• I believe cutting off AI chip sales to China is a strategic mistake that pushes China to develop rival, non-US tech standards.  \n• While we have the resources, I see our role as enabling others by building infrastructure rather than becoming a hyperscaler or model lab ourselves.",
-  "source": "@DwarkeshPatel on Youtube",
-  "id": "b7378d98-e157-468e-a555-de7173b9a043",
-  "savedAt": "2026-04-16T05:10:56.734Z"
+  "content": "AI is being transformed into a foundational technology like electricity, built on a layered stack that begins with raw energy and ends with real-world applications. This \"5-layer cake\" framework shows how deeply interconnected each component is, from power to chips to models and apps.\n\n• The foundation is energy, as AI systems consume vast amounts of electricity to operate continuously.\n• Chips sit above energy, acting as computational engines that turn power into complex calculations.\n• Massive physical infrastructure—cooling, networking, and space—is needed to connect tens of thousands of chips.\n• On top, models and applications deliver intelligence and value, while relying entirely on all lower layers.",
+  "source": "@rohanpaul_ai from x(twitter)",
+  "imageUrl": "https://pbs.twimg.com/media/HDF0t1aaMAAkDR-.png",
+  "id": "832e3730-1cb9-4443-a832-a9cbfcaddb06",
+  "savedAt": "2026-04-21T05:41:54.811Z"
 }

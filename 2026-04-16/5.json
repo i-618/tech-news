@@ -1,0 +1,7 @@
+{
+  "content": "Meta has unveiled Muse Spark, a new multimodal reasoning model featuring thought compression and parallel agent architecture. Developed over nine months, it achieves strong performance with significantly less compute by rethinking training from the ground up.\n\n• Rebuilt training pipeline delivers same capability with over 10x less compute than previous models, showing a fundamental advance in efficiency.  \n• Large-scale reinforcement learning shows stable, log-linear improvement in performance as compute increases, with solid generalization.  \n• Thought compression emerges during training: the model first thinks longer, then condenses reasoning, then expands again for higher performance.  \n• Contemplating mode uses parallel agents to refine answers instead of longer chains, boosting performance without increasing latency.",
+  "source": "@Marktechpost from x(twitter)",
+  "imageUrl": "https://pbs.twimg.com/media/HFgAOPaa0AAimVy.jpg",
+  "id": "6334c390-7267-4655-b48c-546df1bd4c97",
+  "savedAt": "2026-04-10T15:43:30.084Z"
+}
