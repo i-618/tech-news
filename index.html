@@ -126,20 +126,40 @@
       font-size: 1.2rem;
       color: #666;
     }
+
+    .last-updated {
+      position: fixed;
+      top: 0.75rem;
+      right: 1rem;
+      font-size: 0.72rem;
+      color: #8a8a8a;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
+      z-index: 120;
+      text-align: right;
+      max-width: min(58vw, 360px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
   <div id="container"></div>
   <div class="dots" id="dots"></div>
   <div class="timer" id="timer"></div>
+  <div class="last-updated" id="last-updated"></div>
 
   <script>
     const container = document.getElementById('container');
     const dotsContainer = document.getElementById('dots');
     const timerDisplay = document.getElementById('timer');
+    const lastUpdatedDisplay = document.getElementById('last-updated');
     
     const STORAGE_KEY = 'slideshow_data_v2';
     const LEGACY_STORAGE_KEY = 'slideshow_data';
+    const LAST_UPDATED_KEY = 'slideshow_last_updated_ms_v1';
     const IMAGE_DB_NAME = 'tech-news-images';
     const IMAGE_STORE_NAME = 'slides';
     let slides = [];
@@ -149,6 +169,83 @@
     let isPaused = false;
     let indexHtmlSignature = null;
     let imageDbPromise = null;
+    let lastUpdatedMs = null;
+
+    function parseDateToMs(value) {
+      if (typeof value !== 'string' || value.trim() === '') return null;
+      const parsed = Date.parse(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function readUpdatedAtFromPayload(payload) {
+      if (!payload || typeof payload !== 'object') return null;
+      const candidates = [
+        payload.updatedAt,
+        payload.updated_at,
+        payload.gitFetchedAt,
+        payload.git_fetched_at,
+        payload.timestamp
+      ];
+      for (const candidate of candidates) {
+        if (typeof candidate !== 'string') continue;
+        const parsed = parseDateToMs(candidate);
+        if (parsed !== null) return parsed;
+      }
+      return null;
+    }
+
+    function readUpdatedAtFromResponse(response) {
+      if (!response || !response.headers) return null;
+      const candidates = [
+        response.headers.get('x-git-fetch-time'),
+        response.headers.get('x-last-updated'),
+        response.headers.get('last-modified')
+      ];
+      for (const candidate of candidates) {
+        const parsed = parseDateToMs(candidate);
+        if (parsed !== null) return parsed;
+      }
+      return null;
+    }
+
+    function formatUpdatedAt(ms) {
+      if (!Number.isFinite(ms)) return 'Last updated: --';
+      const dateText = new Intl.DateTimeFormat(undefined, {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric'
+      }).format(new Date(ms));
+      const timeText = new Intl.DateTimeFormat(undefined, {
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(new Date(ms));
+      return `Last updated on ${dateText}`;
+    }
+
+    function renderUpdatedAt() {
+      if (!lastUpdatedDisplay) return;
+      lastUpdatedDisplay.textContent = formatUpdatedAt(lastUpdatedMs);
+    }
+
+    function setLastUpdated(ms) {
+      if (!Number.isFinite(ms)) return;
+      lastUpdatedMs = ms;
+      renderUpdatedAt();
+      try {
+        localStorage.setItem(LAST_UPDATED_KEY, String(ms));
+      } catch (e) {}
+    }
+
+    function loadLastUpdated() {
+      try {
+        const raw = localStorage.getItem(LAST_UPDATED_KEY);
+        if (!raw) return;
+        const parsed = Number(raw);
+        if (Number.isFinite(parsed)) {
+          lastUpdatedMs = parsed;
+        }
+      } catch (e) {}
+    }
 
     function openImageDb() {
       if (!('indexedDB' in window)) return Promise.resolve(null);
@@ -320,25 +417,41 @@
       let index = 1;
       const loaded = [];
       const cacheBuster = Date.now();
+      let terminationUncertain = false;
+      let lastUpdatedFromFetch = null;
 
       while (true) {
         const jsonFile = `latest/${index}.json`;
         const pngFile = `latest/${index}.png`;
+        let jsonFetchFailed = false;
+        let pngFetchFailed = false;
 
         try {
           const jsonRes = await fetch(`${jsonFile}?t=${cacheBuster}`);
           if (jsonRes.ok) {
             const data = await jsonRes.json();
+            const fromPayload = readUpdatedAtFromPayload(data);
+            const fromHeaders = readUpdatedAtFromResponse(jsonRes);
+            const candidate = fromPayload || fromHeaders;
+            if (candidate !== null) {
+              lastUpdatedFromFetch = Math.max(lastUpdatedFromFetch || 0, candidate);
+            }
             loaded.push({ type: 'json', content: data.content, source: data.source });
             index++;
             continue;
           }
-        } catch (e) {}
+        } catch (e) {
+          jsonFetchFailed = true;
+        }
 
         let canUseStoredPng = false;
         try {
           const pngRes = await fetch(`${pngFile}?t=${cacheBuster}`, { cache: 'no-store' });
           if (pngRes.ok) {
+            const fromHeaders = readUpdatedAtFromResponse(pngRes);
+            if (fromHeaders !== null) {
+              lastUpdatedFromFetch = Math.max(lastUpdatedFromFetch || 0, fromHeaders);
+            }
             const blob = await pngRes.blob();
             const imageVersion = await hashBlob(blob);
             await storeImageBlob(pngFile, blob);
@@ -347,6 +460,7 @@
             continue;
           }
         } catch (e) {
+          pngFetchFailed = true;
           canUseStoredPng = true;
         }
 
@@ -360,10 +474,15 @@
           }
         }
 
+        terminationUncertain = jsonFetchFailed || pngFetchFailed;
         break;
       }
 
-      return materializeSlides(loaded);
+      return {
+        slides: await materializeSlides(loaded),
+        terminationUncertain,
+        lastUpdatedMs: lastUpdatedFromFetch
+      };
     }
 
     function saveToSession(data) {
@@ -427,8 +546,16 @@
       return results.every((result) => result.status === 'fulfilled');
     }
 
-    async function applySlidesIfReady(nextSlides, preserveIndex = false) {
+    async function applySlidesIfReady(nextSlides, preserveIndex = false, options = {}) {
+      const terminationUncertain = Boolean(options.terminationUncertain);
+
       if (nextSlides.length === 0) {
+        revokeSlideUrls(nextSlides);
+        return false;
+      }
+
+      const wouldShrinkExistingData = slides.length > 0 && nextSlides.length < slides.length;
+      if (terminationUncertain && wouldShrinkExistingData) {
         revokeSlideUrls(nextSlides);
         return false;
       }
@@ -459,6 +586,8 @@
 
     async function loadSlides() {
       await requestPersistentStorage();
+      loadLastUpdated();
+      renderUpdatedAt();
       const cached = await materializeSlides(loadFromSession() || []);
       let cacheRendered = false;
       
@@ -482,9 +611,15 @@
         container.innerHTML = '<div class="loading">Loading...</div>';
       }
 
-      const freshData = await fetchSlides();
+      const freshResult = await fetchSlides();
+      const freshData = freshResult.slides;
+      if (freshResult.lastUpdatedMs !== null) {
+        setLastUpdated(freshResult.lastUpdatedMs);
+      }
 
-      const applied = await applySlidesIfReady(freshData);
+      const applied = await applySlidesIfReady(freshData, false, {
+        terminationUncertain: freshResult.terminationUncertain
+      });
       if (!applied && slides.length === 0) {
         container.innerHTML = '<div class="error">No content found in latest/ folder</div>';
       }
@@ -492,8 +627,13 @@
 
     async function refreshData() {
       try {
-        const freshData = await fetchSlides();
-        await applySlidesIfReady(freshData, true);
+        const freshResult = await fetchSlides();
+        if (freshResult.lastUpdatedMs !== null) {
+          setLastUpdated(freshResult.lastUpdatedMs);
+        }
+        await applySlidesIfReady(freshResult.slides, true, {
+          terminationUncertain: freshResult.terminationUncertain
+        });
       } catch (e) {}
     }
 
