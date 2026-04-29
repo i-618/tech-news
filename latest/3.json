@@ -1,7 +1,6 @@
 {
-  "content": "AI is being transformed into a foundational technology like electricity, built on a layered stack that begins with raw energy and ends with real-world applications. This \"5-layer cake\" framework shows how deeply interconnected each component is, from power to chips to models and apps.\n\n• The foundation is energy, as AI systems consume vast amounts of electricity to operate continuously.\n• Chips sit above energy, acting as computational engines that turn power into complex calculations.\n• Massive physical infrastructure—cooling, networking, and space—is needed to connect tens of thousands of chips.\n• On top, models and applications deliver intelligence and value, while relying entirely on all lower layers.",
-  "source": "@rohanpaul_ai from x(twitter)",
-  "imageUrl": "https://pbs.twimg.com/media/HDF0t1aaMAAkDR-.png",
-  "id": "832e3730-1cb9-4443-a832-a9cbfcaddb06",
-  "savedAt": "2026-04-21T05:41:54.811Z"
+  "content": "Claude now integrates with various creative tools through new connectors, enhancing productivity and creativity. These integrations streamline workflows across design, video, 3D modeling, and more, enabling users to bring ideas to life through conversational AI.\n\n• Adobe for creativity lets you access 50+ tools in Creative Cloud, including Photoshop and Premiere, to enhance images, videos, and designs  \n• Affinity by Canva automates repetitive tasks like batch edits and file exports, and helps you generate custom features directly in the app  \n• Autodesk Fusion enables you to create and modify 3D models through simple conversations with Claude  \n• Blender provides you a natural-language interface to its Python API, simplifying complex setups and improving access to documentation",
+  "source": "@claudeai from x(twitter)",
+  "id": "a620e8b5-daab-4c4c-87b4-1a6a1d0e19ff",
+  "savedAt": "2026-04-29T15:11:27.845Z"
 }
