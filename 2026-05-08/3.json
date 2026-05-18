@@ -1,0 +1,6 @@
+{
+  "content": "Lex Fridman speaks with Jean-Baptiste Kempf and Kieran Kunhya, the lead engineers behind the widely used open-source projects VLC and FFmpeg. They discuss the culture, impact, and ethics behind building foundational software that runs on billions of devices, from everyday gadgets to space missions.\n\n• Open source thrives on meritocracy—contributors from teenagers to engineers in war zones are judged solely on code quality, not background or credentials.  \n• FFmpeg has interplanetary scaling, running on billions of devices and even enabling image compression on NASA’s Mars 2020 rover.  \n• Contributing to these projects offers elite, real-world programming training through rigorous code reviews by expert low-level developers.  \n• Integrity is paramount—JB refused millions to keep VLC ad-free and spyware-free, ensuring its reputation as a trusted, ethical software worldwide.",
+  "source": "@lexfridman from youtube",
+  "id": "0392ad7d-e0d7-46a9-aa05-187db62bc338",
+  "savedAt": "2026-05-06T09:58:36.653Z"
+}

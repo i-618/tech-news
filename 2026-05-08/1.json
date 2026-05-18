@@ -1,0 +1,7 @@
+{
+  "content": "Nvidia and Span are revolutionizing AI infrastructure by placing mini data centers—called XFRA nodes—right in residential homes, using existing electrical capacity. These nodes leverage unused power from homes built by PulteGroup, bypassing the long delays of grid interconnection that stall traditional AI data centers.\n\n• Each XFRA node contains 16 Blackwell RTX Pro 6000 GPUs, 4 AMD EPYC CPUs, and 3TB of RAM, housed in a Dell PowerEdge rack installed beside home AC units.  \n• Homeowners pay nothing and receive discounted electricity and internet in exchange for allowing Span to use surplus electrical capacity from their 200A panels.  \n• The key bottleneck for AI growth isn’t GPUs or money—it’s grid access, with over 2,600 gigawatts stuck in interconnection queues; Span’s behind-the-meter solution avoids this entirely.  \n• PulteGroup integrates the system during construction, gaining a marketable feature and revenue share, while Span deploys clusters at one-fifth the cost and six times faster than traditional 100MW data centers.",
+  "source": "@aakashgupta from x(twitter)",
+  "imageUrl": "https://pbs.twimg.com/media/HHnvGcJa0AAuv_t.jpg",
+  "id": "29280d44-6a2b-4fb0-9c38-0b89758d7b4f",
+  "savedAt": "2026-05-06T09:47:21.107Z"
+}

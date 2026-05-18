@@ -1,0 +1,7 @@
+{
+  "content": "Five experts who built leading AI prototyping tools share a surprising common practice despite different backgrounds and workflows. Though they start from unique points, all emphasize deliberate constraints to guide AI effectively.\n\n• Sachin Rekhi uses real product screenshots to build reusable, styled templates, ensuring prototypes reflect actual design systems instead of generic frameworks.  \n• Boris Cherny generates dozens of variations and applies an 80% kill rate, treating elimination as a core part of creative refinement.  \n• Colin Matthews commands Bolt to \"make a plan, don’t write code,\" significantly improving output quality through structured planning.  \n• Dan Olsen begins with a mini-PRD and Nadav Abrahami stresses clarity, both ensuring the AI avoids drift and misinterpretation through early constraints.",
+  "source": "@aakashgupta from x(twitter)",
+  "imageUrl": "https://pbs.twimg.com/media/HIjaOLHaMAAqwpt.png",
+  "id": "340336ba-b23e-428f-b57e-e7883f6f28f4",
+  "savedAt": "2026-05-18T12:13:46.462Z"
+}
