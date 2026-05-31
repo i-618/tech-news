@@ -10,6 +10,7 @@
     // CONFIGURATION
     // ═══════════════════════════════════════════════════════════
     const SLIDE_DURATION = 15;        // Slide duration in seconds
+    const MAX_TIMER_DURATION = 60;    // Maximum timer duration in seconds
     const MARGIN = 40;               // Margin around content in pixels
     const REFRESH_INTERVAL = 30;     // Data refresh interval in seconds
     const INDEX_HTML_CHECK_INTERVAL = 60; // Check index.html updates in seconds
@@ -166,7 +167,6 @@
     let currentIndex = 0;
     let countdown = SLIDE_DURATION;
     let intervalId = null;
-    let isPaused = false;
     let indexHtmlSignature = null;
     let imageDbPromise = null;
     let lastUpdatedMs = null;
@@ -793,18 +793,24 @@
     }
 
     function updateTimer() {
-      timerDisplay.textContent = isPaused ? `Paused (${countdown}s)` : `${countdown}s`;
+      timerDisplay.textContent = `${countdown}s`;
+    }
+
+    function setCountdown(value) {
+      countdown = Math.max(0, Math.min(MAX_TIMER_DURATION, value));
+      updateTimer();
+    }
+
+    function extendTimer(seconds) {
+      setCountdown(countdown + seconds);
     }
 
     function startTimer() {
       if (intervalId) clearInterval(intervalId);
-      countdown = SLIDE_DURATION;
-      updateTimer();
+      setCountdown(SLIDE_DURATION);
       
       intervalId = setInterval(() => {
-        if (isPaused) return;
-        countdown--;
-        updateTimer();
+        setCountdown(countdown - 1);
         
         if (countdown <= 0) {
           next();
@@ -824,8 +830,7 @@
         el.classList.toggle('active', i === currentIndex);
       });
       
-      countdown = SLIDE_DURATION;
-      updateTimer();
+      setCountdown(SLIDE_DURATION);
     }
 
     function goToSlide(index) {
@@ -840,17 +845,11 @@
       showSlide(currentIndex - 1);
     }
 
-    function togglePause() {
-      if (slides.length === 0) return;
-      isPaused = !isPaused;
-      updateTimer();
-    }
-
     document.addEventListener('keydown', (e) => {
       const isSpace = e.code === 'Space' || e.key === ' ' || e.key === 'Spacebar';
       if (isSpace) {
         e.preventDefault();
-        if (!e.repeat) togglePause();
+        if (!e.repeat && slides.length > 0) extendTimer(15);
         return;
       }
       if (e.key === 'ArrowRight') next();
