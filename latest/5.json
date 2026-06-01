@@ -1,0 +1,7 @@
+{
+  "content": "OpenAI pioneered a system where product managers ship over 100,000 lines of code by leveraging AI agents guided by strict engineering-enforced guardrails. Engineers no longer write production code but instead build a \"harness\" that ensures AI-generated code is safe, scalable, and error-free.\n\n• Engineers are banned from writing production code, focusing entirely on building the harness—comprising tests, documentation, and guardrails—to prevent AI mistakes before they happen.  \n• A PM can write a PRD on Monday and ship a working pull request by Friday without any engineer touching the code, after an initial slow ramp-up period.  \n• The harness consolidates tribal knowledge into a centralized prompt catalog, converts every failed AI run into permanent rules, and treats prompts like code with reviews and regression tests.  \n• With 250,000 lines of markdown under version control, the system enables PMs, designers, and ops to contribute directly while engineers shift to building leverage and systemic quality.",
+  "source": "@aakashgupta from x(twitter)",
+  "imageUrl": "https://pbs.twimg.com/media/HJrFAyVasAAfdLI.jpg",
+  "id": "eee4ed0e-f4a8-4336-bff0-2dd6719400fd",
+  "savedAt": "2026-06-01T15:52:14.061Z"
+}

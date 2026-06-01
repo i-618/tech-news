@@ -1,7 +1,6 @@
 {
-  "content": "Excessive AI use is causing a new form of mental exhaustion called \"AI brain fry,\" particularly among high-performing employees pushing beyond their limits. A Harvard Business Review study of 1,500 workers shows AI is increasing workloads and mental fatigue instead of reducing them.\n\n• AI use leads to constant task-switching and oversight, creating cognitive overload and \"mental fog\" in workers.  \n• 14% of full-time employees already experience this fatigue, especially in tech, IT, and finance roles.  \n• High oversight demands, like managing multiple AI agents, increase mental fatigue by 12% and decision fatigue by 33%.  \n• This burnout raises employee turnover risk by 10% and costs firms millions due to poor or delayed decisions.",
-  "source": "@rohanpaul_ai from x(twitter)",
-  "imageUrl": "https://pbs.twimg.com/media/HIQltBGbwAEXoqt.jpg",
-  "id": "a1d7202b-c744-467a-950e-097576967f60",
-  "savedAt": "2026-05-18T12:10:33.233Z"
+  "content": "NVIDIA has revolutionized object detection with a radical rethinking of how vision-language models handle bounding boxes, achieving unprecedented speed and accuracy. Their new model, LocateAnything, challenges the long-held assumption that boxes must be predicted token by token, instead treating them as atomic units.\n\n• Introduces LocateAnything, a 3B vision-language model that predicts bounding boxes in one parallel step instead of sequentially  \n• Achieves 12.7 boxes/sec on a single H100—10x faster than Qwen3-VL—with improved accuracy (+3.8% F1 on LVIS)  \n• Excels in dense scenes (up to 300 boxes) and includes a safety fallback to sequential decoding if errors are detected  \n• Trained on 785M boxes across 138M queries, spanning referring expressions, GUI navigation, and OCR tasks",
+  "source": "@DataChaz from x(twitter)",
+  "id": "b6dc2f98-0b7d-4ebc-bced-a6825b879c32",
+  "savedAt": "2026-06-01T15:48:10.486Z"
 }

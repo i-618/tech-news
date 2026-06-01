@@ -1,0 +1,6 @@
+{
+  "content": "In a discussion with Dwarkesh Patel, AI researcher Eric Jang shares insights from his ambitious project to recreate AlphaGo using modern techniques. Leveraging his expertise from roles at Google DeepMind Robotics and 1X Technologies, he achieved a powerful, cost-effective version of the historic AI with open-source tools and LLM assistance.\n\n• Successfully rebuilt and enhanced AlphaGo for just a few thousand dollars using LLM coding assistants, rented compute, and open-source frameworks  \n• Utilized Monte Carlo Tree Search (MCTS) with its four-step process—selection, expansion, evaluation, and backup—to navigate Go’s vast move space  \n• Integrated value and policy neural networks to drastically reduce computational load by estimating winners and filtering strong moves  \n• Improved performance through self-play and knowledge distillation, where MCTS-guided moves train the policy network to develop sharper intuition over time",
+  "source": "@DwarkeshPatel on Youtube",
+  "id": "b3a224f6-75b0-4431-b458-b3159586f671",
+  "savedAt": "2026-05-18T12:10:14.032Z"
+}
